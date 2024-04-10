@@ -6,9 +6,6 @@
       <p>paragraph</p>
       <i>italic</i>
       </center>
-      <script>
-        alert(2)
-      </script>
     </div>
   </foreignObject>
 </svg>
