@@ -1,0 +1,5 @@
+https://uberhub.uberinternal.com/angular.do?sysparm_type=get_partial&name=cmdb_csdm_app_service_users/user/activity
+https://uberhub.uberinternal.com/angular.do?sysparm_type=get_partial&name=cmdb_csdm_app_service_users/users/timeline
+https://uberhub.uberinternal.com/angular.do?sysparm_type=get_partial&name=cmdb_csdm_summer/form
+https://uberhub.uberinternal.com/angular.do?sysparm_type=get_partial&name=cmdb_csdm_app_service_*/activity
+https://uberhub.uberinternal.com/angular.do?sysparm_type=get_partial&name=cmdb_csdm_app_service_index.cfm/email#
