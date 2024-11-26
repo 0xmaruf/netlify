@@ -153,6 +153,7 @@
     <a href="#about">About Me</a>
     <a href="#skills">Skills</a>
     <a href="#swags">Swags</a>
+    <a href="#events">Events</a>
     <a href="#hall-of-fame">Hall of Fame</a>
     <a href="#write-ups">Write-ups</a>
     <a href="#contact">Contact</a>
@@ -189,11 +190,28 @@
   <section id="swags">
     <h2>Swags</h2>
     <div class="swags-images">
-      <img src="https://pbs.twimg.com/media/C9r9X38U0AArIir?format=jpg" alt="Swag Image 1" class="swag-image">
-      <img src="https://pbs.twimg.com/media/C9r9X38U0AArIir?format=jpg" alt="Swag Image 2" class="swag-image">
+      <img src="https://github.com/0xmaruf/netlify/blob/main/swags/20241121_152414.jpg?raw=true" alt="Swag Image 1" class="swag-image">
+      <img src="https://github.com/0xmaruf/netlify/blob/main/swags/-bvas0e.jpg?raw=true" alt="Swag Image 2" class="swag-image">
       <!-- Add more swag images here -->
     </div>
   </section>
+  <section id="events">
+   <h2>Events</h2>
+   <div id="slider" style="position: relative; width: 450px; height:300px; margin: auto; overflow: hidden; border: 2px solid #00ff00; border-radius: 10px;">
+        <div id="slider-images" style="display: flex; transition: transform 0.5s ease-in-out;">
+            <img src="https://raw.githubusercontent.com/0xmaruf/netlify/refs/heads/main/bughunt/photo_2024-11-20_02-44-00.jpg" alt="Event 1" style="width: 720px; height: 300px;">
+            <img src="https://raw.githubusercontent.com/0xmaruf/netlify/refs/heads/main/bughunt/photo_2024-11-20_02-43-08.jpg" alt="Event 2" style="width: 720px; height: 300px;">
+            <img src="https://github.com/0xmaruf/netlify/blob/main/bughunt/photo_2024-11-20_02-43-18.jpg?raw=true" alt="Event 3" style="width: 720px; height: 300px;">
+	    <img src="https://github.com/0xmaruf/netlify/blob/main/bughunt/photo_2024-11-20_02-43-19.jpg?raw=true" alt="Event 3" style="width: 720px; height: 300px;">
+            <img src="https://github.com/0xmaruf/netlify/blob/main/bughunt/photo_2024-11-20_02-43-37.jpg?raw=true" alt="Event 3" style="width: 720px; height: 300px;">
+            <img src="https://github.com/0xmaruf/netlify/blob/main/bughunt/photo_2024-11-21_12-54-31.jpg?raw=true" alt="Event 3" style="width: 720px; height: 300px;">
+            <img src="https://github.com/0xmaruf/netlify/blob/main/bughunt/photo_2024-11-21_12-57-06.jpg?raw=true" alt="Event 3" style="width: 720px; height: 300px;">
+            <img src="https://github.com/0xmaruf/netlify/blob/main/bughunt/photo_2024-11-21_12-57-59.jpg?raw=true" alt="Event 3" style="width: 720px; height: 300px;">
+        </div>
+        <button id="prev" style="position: absolute; top: 50%; left: 10px; transform: translateY(-50%); background-color: #00ff00; border: none; padding: 10px; cursor: pointer; border-radius: 5px;">&#8592;</button>
+        <button id="next" style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); background-color: #00ff00; border: none; padding: 10px; cursor: pointer; border-radius: 5px;">&#8594;</button>
+    </div>
+    </section>
   <section id="hall-of-fame">
     <h2>Hall of Fame</h2>
     <p>Celebrate the acknowledgments and recognitions received in the cybersecurity community.</p>
@@ -212,6 +230,7 @@
       <a href="https://0xmaruf.medium.com/firing-8-account-takeover-methods-77e892099050" target="_blank" rel="noopener noreferrer" class="writeup-link">Firing 8 Account Takeover Methods</a>
       <a href="https://0xmaruf.medium.com/dont-you-have-burpsuite-pro-a74efc7142c" target="_blank" rel="noopener noreferrer" class="writeup-link">Don't You Have BurpSuite Pro?</a>
       <a href="https://0xmaruf.medium.com/all-onliners-for-bug-bounty-hunters-7f77f5bd41b" target="_blank" rel="noopener noreferrer" class="writeup-link">All Oneliners for Bug Bounty Hunters</a>
+      <a href="https://0xmaruf.medium.com/grep-tips-for-javascript-analysis-bug-bounty-7dce88266121" target="_blank" rel="noopener noreferrer" class="writeup-link">Grep tips for Javascript Analysis | Bug Bounty</a>
       <!-- Add more write-up links here -->
     </div>
   </section>
@@ -233,5 +252,46 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
   </section>
+
+ <script>
+        const sliderImages = document.getElementById('slider-images');
+        const prevButton = document.getElementById('prev');
+        const nextButton = document.getElementById('next');
+        const totalSlides = sliderImages.children.length;
+        let currentIndex = 0;
+
+        // Function to update the slide
+        function updateSlide(index) {
+            sliderImages.style.transform = `translateX(-${index * 100}%)`;
+        }
+
+        // Manual navigation
+        prevButton.addEventListener('click', () => {
+            currentIndex = (currentIndex > 0) ? currentIndex - 1 : totalSlides - 1;
+            updateSlide(currentIndex);
+            resetAutoSlide();
+        });
+
+        nextButton.addEventListener('click', () => {
+            currentIndex = (currentIndex < totalSlides - 1) ? currentIndex + 1 : 0;
+            updateSlide(currentIndex);
+            resetAutoSlide();
+        });
+
+        // Auto-slide functionality
+        let autoSlide = setInterval(() => {
+            currentIndex = (currentIndex + 1) % totalSlides;
+            updateSlide(currentIndex);
+        }, 3000); // Change slide every 3 seconds
+
+        // Reset auto-slide when manual navigation is triggered
+        function resetAutoSlide() {
+            clearInterval(autoSlide);
+            autoSlide = setInterval(() => {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                updateSlide(currentIndex);
+            }, 3000);
+        }
+    </script>
 </body>
 </html>
