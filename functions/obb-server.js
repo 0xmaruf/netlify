@@ -2,7 +2,7 @@ const fetch = require("node-fetch");
 
 // Telegram bot credentials
 const BOT_TOKEN = "7862728855:AAE2TMnjjXyfM_dsWsv6i44linILhvZgQlA/SendMessage";
-const CHAT_ID = "marufobb_bot";
+const CHAT_ID = "946787813";
 
 // Function to send message to Telegram
 async function sendToTelegram(message) {
