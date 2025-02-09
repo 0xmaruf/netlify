@@ -1,12 +1,12 @@
 const fetch = require("node-fetch");
 
 // Telegram bot credentials
-const BOT_TOKEN = "your_bot_token";
-const CHAT_ID = "your_chat_id";
+const BOT_TOKEN = "7862728855:AAE2TMnjjXyfM_dsWsv6i44linILhvZgQlA/SendMessage";
+const CHAT_ID = "marufobb_bot";
 
 // Function to send message to Telegram
 async function sendToTelegram(message) {
-  const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+  const url = `https://api.telegram.org/bot7862728855:AAE2TMnjjXyfM_dsWsv6i44linILhvZgQlA/SendMessage`;
   const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
