@@ -4,27 +4,138 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Cyrex — Security Researcher & Bug Bounty Portfolio</title>
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
   <style>
-    :root{ --bg:#05060a; --panel:rgba(0,255,156,0.04); --accent:#00ff9c; --muted:#9aa4b2; --glass: rgba(255,255,255,0.02); --glass-2: rgba(0,0,0,0.45);} *{box-sizing:border-box} html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Share Tech Mono',monospace;background:linear-gradient(180deg,#040509 0%, #06101a 100%);color:#e6fff6} header.site-header{position:sticky;top:0;z-index:70;background:linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.25));backdrop-filter:blur(6px);border-bottom:1px solid rgba(0,255,156,0.06);display:flex;align-items:center;justify-content:space-between;padding:12px 24px;} .container{max-width:1100px;margin:0 auto;padding:18px} .section-nav a{color:var(--muted);text-decoration:none;margin:0 12px;font-weight:600;font-family:'Share Tech Mono';position:relative;} .section-nav a::after{content:'';position:absolute;left:0;bottom:-4px;width:0;height:2px;background:var(--accent);transition:0.3s;} .section-nav a:hover::after{width:100%;} .hero{min-height:64vh;display:flex;align-items:center} .hero-grid{display:grid;grid-template-columns:1fr 360px;gap:32px;align-items:center} .hero-card{background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.2));padding:28px;border-radius:12px;border:1px solid rgba(0,255,156,0.06)} .lead{font-size:28px;margin:0 0 10px 0;line-height:1.05} .muted{color:var(--muted);font-size:14px} .cta-row{margin-top:18px;display:flex;gap:12px} .btn{padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);cursor:pointer;background:transparent;color:var(--accent);font-weight:700} .btn.secondary{color:var(--muted);border:1px solid rgba(255,255,255,0.02)} section{padding:48px 0} h2.section-title{font-family:'Share Tech Mono';font-size:20px;color:var(--accent);margin:0 0 18px;border-left:4px solid var(--accent);padding-left:12px;text-transform:uppercase;letter-spacing:1.2px} .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px} .panel{background:var(--panel);padding:18px;border-radius:10px;border:1px solid rgba(0,255,156,0.04)} .writeup{display:flex;flex-direction:column;gap:8px} .writeup .title{font-weight:600} .events-list{display:flex;flex-direction:column;gap:12px} .event{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:8px;background:var(--glass);border:1px solid rgba(255,255,255,0.02)} .swag-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px} .swag{padding:14px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(0,255,156,0.04);min-height:120px} .contact-grid{display:grid;grid-template-columns:1fr 360px;gap:18px} form input, form textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit} form label{font-size:13px;color:var(--muted);margin-bottom:6px;display:block} footer{padding:28px 0;color:var(--muted);border-top:1px solid rgba(255,255,255,0.02)} @media (max-width:980px){.hero-grid{grid-template-columns:1fr} .grid{grid-template-columns:1fr 1fr} .swag-grid{grid-template-columns:1fr 1fr} .contact-grid{grid-template-columns:1fr} } @media (max-width:560px){.grid{grid-template-columns:1fr} .handles{display:none}} #matrix{position:fixed;inset:0;z-index:0;opacity:0.12;pointer-events:none} .small{font-size:13px;color:var(--muted)} .mono{font-family:'Share Tech Mono', monospace} .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:200} .modal .dialog{width:880px;max-width:96%;background:linear-gradient(180deg,#071018,#08121a);padding:18px;border-radius:10px;border:1px solid rgba(0,255,156,0.06)}
-  /* Sticky header with H1 + handles visible all time */
-  header.site-header{position:sticky;top:0;z-index:60;background:linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.25));backdrop-filter:blur(6px);border-bottom:1px solid rgba(0,255,156,0.06)}
-    .container{max-width:1100px;margin:0 auto;padding:18px}
+    :root{
+      --bg:#16e56f;
+      --panel:rgba(0,255,156,0.04);
+      --accent:#00ff9c;
+      --muted:#9aa4b2;
+      --glass: rgba(255,255,255,0.02);
+      --glass-2: rgba(0,0,0,0.45);
+    }
+
+    /* Base resets */
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Share Tech Mono',monospace;color:#e6fff6; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+    a{color:inherit}
+
+    /* FULL PAGE unified background on body (solid color) */
+    body{
+      background: #02030a;
+      color: #e6fff6;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Put the animated cyber-grid canvas behind everything */
+    canvas#matrix{
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+      display: block;
+    }
+
+    /* Keep containers transparent so gradient + grid shows through */
+    .container{max-width:1100px;margin:0 auto;padding:18px;background:transparent}
+    main.container{background:transparent}
+
+    /* Header */
+    header.site-header{
+      position:sticky;
+      top:0;
+      z-index:70;
+      background: linear-gradient(180deg, rgba(2,6,10,0.6), rgba(2,6,10,0.35));
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid rgba(0,255,156,0.06);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:12px 24px;
+    }
+
     .header-inner{display:flex;align-items:center;gap:20px}
     .brand{display:flex;align-items:center;gap:14px}
-    .brand h1{font-family:'Share Tech Mono', monospace;font-size:20px;margin:0;color:var(--accent);letter-spacing:0.8px}
+    .brand h1{font-family:'Share Tech Mono',monospace;font-size:20px;margin:0;color:var(--accent);letter-spacing:0.8px}
     .brand p{margin:0;font-size:12px;color:var(--muted)}
+
     nav.main-nav{margin-left:auto}
     nav.main-nav a{color:var(--muted);text-decoration:none;margin:0 10px;padding:6px 10px;border-radius:6px;font-weight:600}
     nav.main-nav a:hover{color:#fff;background:rgba(255,255,255,0.02)}
+
     .handles{display:flex;gap:10px;margin-left:16px}
     .handles a{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:var(--glass);color:var(--accent);font-size:13px;text-decoration:none}
 
+    /* Hero + layout */
+    .hero{min-height:64vh;display:flex;align-items:center;padding-top:18px}
+    .hero-grid{display:grid;grid-template-columns:1fr 360px;gap:32px;align-items:center}
+    .hero-card{
+      background: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.12));
+      padding:28px;border-radius:12px;border:1px solid rgba(0,255,156,0.06);
+      backdrop-filter: blur(4px);
+      box-shadow: 0 6px 28px rgba(0, 160, 140, 0.04);
+    }
+
+    .lead{font-size:28px;margin:0 0 10px 0;line-height:1.05}
+    .muted{color:var(--muted);font-size:14px}
+    .cta-row{margin-top:18px;display:flex;gap:12px}
+    .btn{padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);cursor:pointer;background:transparent;color:var(--accent);font-weight:700}
+    .btn.secondary{color:var(--muted);border:1px solid rgba(255,255,255,0.02)}
+
+    section{padding:48px 0}
+    h2.section-title{font-family:'Share Tech Mono';font-size:20px;color:var(--accent);margin:0 0 18px;border-left:4px solid var(--accent);padding-left:12px;text-transform:uppercase;letter-spacing:1.2px}
+
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .panel{background:linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.08));padding:18px;border-radius:10px;border:1px solid rgba(0,255,156,0.04);backdrop-filter: blur(3px)}
+    .writeup{display:flex;flex-direction:column;gap:8px}
+    .writeup .title{font-weight:600}
+    .events-list{display:flex;flex-direction:column;gap:12px}
+    .event{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.06));border:1px solid rgba(255,255,255,0.02)}
+    .swag-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .swag{padding:14px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(0,255,156,0.04);min-height:120px}
+    .contact-grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
+    form input, form textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    form label{font-size:13px;color:var(--muted);margin-bottom:6px;display:block}
+    footer{padding:28px 0;color:var(--muted);border-top:1px solid rgba(255,255,255,0.02)}
+
+    .small{font-size:13px;color:var(--muted)}
+    .mono{font-family:'Share Tech Mono', monospace}
+
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:200}
+    .modal .dialog{width:880px;max-width:96%;background:linear-gradient(180deg,#071018,#08121a);padding:18px;border-radius:10px;border:1px solid rgba(0,255,156,0.06)}
+
+    /* Responsive tweaks */
+    @media (max-width:980px){
+      .hero-grid{grid-template-columns:1fr}
+      .grid{grid-template-columns:1fr 1fr}
+      .swag-grid{grid-template-columns:1fr 1fr}
+      .contact-grid{grid-template-columns:1fr}
+    }
+    @media (max-width:560px){
+      .grid{grid-template-columns:1fr}
+      .handles{display:none}
+    }
+
+    /* subtle neon focus outlines for accessibility */
+    a:focus, button:focus, input:focus, textarea:focus {
+      outline: 2px solid rgba(0,255,156,0.18);
+      outline-offset: 2px;
+    }
+
+    /* small adjustments for circular profile image container */
+    .panelimg img { transition: transform 0.25s ease; }
+    .panelimg img:hover { transform: translateY(-4px) scale(1.02); }
+
   </style>
 </head>
-<body>
-  <!-- TOP NAVIGATION FOR SECTIONS -->
+<body background="white">
+  <!-- Animated cyber-grid canvas (TRON-like) -->
   <canvas id="matrix"></canvas>
 
   <header class="site-header">
@@ -111,8 +222,6 @@
           <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
           <p class="small">Top Tools: Intelligence • Burp • Remote Server</p>
         </div>
-      </aside>
-    </div>
       </div>
     </section>
 
@@ -181,8 +290,6 @@
         </div>
 
       </div>
-
-      
     </section>
 
      <!-- EVENTS -->
@@ -250,7 +357,7 @@
   </div>
 
   <script>
-    // Tiny typing loop in hero
+    // === Typing effect (kept from your original) ===
     const P = [
       'I research web apps.',
       'I automate hunting workflows.',
@@ -265,18 +372,263 @@
       if(char < str.length){ el.textContent += str.charAt(char); char++; setTimeout(tick,40); }
       else{ setTimeout(()=>{ // pause then delete
         const del = setInterval(()=>{
-          if(el.textContent.length>0) el.textContent = el.textContent.slice(0,-1); else { clearInterval(del); pIdx=(pIdx+1)%P.length; char=0; tick(); }
+          if(el.textContent.length>0) el.textContent = el.textContent.slice(0,-1);
+          else { clearInterval(del); pIdx=(pIdx+1)%P.length; char=0; tick(); }
         },30);
       },1200)}
     }
     tick();
-    setInterval(()=>{ cur.style.opacity = cur.style.opacity==='0' ? '1' : '0' },500);
+    setInterval(()=>{ if(cur) cur.style.opacity = cur.style.opacity==='0' ? '1' : '0' },500);
 
-    // Matrix background
+    // === CYBERPUNK TECHY BACKGROUND ===
     const canvas = document.getElementById('matrix');
     const ctx = canvas.getContext('2d');
-    function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
-</script>
+    let W = 0, H = 0;
+
+    function resizeCanvas(){
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+      initElements();
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Hexagon grid
+    const hexagons = [];
+    const hexSize = 40;
+
+    // Circuit nodes
+    const nodes = [];
+
+    // Data streams
+    const streams = [];
+
+    // Glowing particles
+    const particles = [];
+
+    function initElements() {
+      hexagons.length = 0;
+      nodes.length = 0;
+      streams.length = 0;
+      particles.length = 0;
+
+      // Create hexagon grid
+      for(let y = -hexSize; y < H + hexSize; y += hexSize * 1.5) {
+        for(let x = -hexSize; x < W + hexSize; x += hexSize * Math.sqrt(3)) {
+          const offset = (Math.floor(y / (hexSize * 1.5)) % 2) * (hexSize * Math.sqrt(3) / 2);
+          hexagons.push({
+            x: x + offset,
+            y: y,
+            opacity: Math.random() * 0.3,
+            pulseSpeed: 0.5 + Math.random() * 1.5,
+            pulseOffset: Math.random() * Math.PI * 2
+          });
+        }
+      }
+
+      // Create circuit nodes
+      for(let i = 0; i < 25; i++) {
+        nodes.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          size: 2 + Math.random() * 3,
+          pulse: Math.random() * Math.PI * 2,
+          connections: []
+        });
+      }
+
+      // Create data streams
+      for(let i = 0; i < 8; i++) {
+        streams.push({
+          x: Math.random() * W,
+          y: -20,
+          speed: 1 + Math.random() * 2,
+          length: 40 + Math.random() * 60,
+          opacity: 0.3 + Math.random() * 0.4
+        });
+      }
+
+      // Create particles
+      for(let i = 0; i < 100; i++) {
+        particles.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          size: Math.random() * 1.5 + 0.5,
+          opacity: Math.random() * 0.5 + 0.2
+        });
+      }
+    }
+
+    initElements();
+
+    let time = 0;
+
+    function drawHexagon(x, y, size) {
+      ctx.beginPath();
+      for(let i = 0; i < 6; i++) {
+        const angle = (Math.PI / 3) * i;
+        const hx = x + size * Math.cos(angle);
+        const hy = y + size * Math.sin(angle);
+        if(i === 0) ctx.moveTo(hx, hy);
+        else ctx.lineTo(hx, hy);
+      }
+      ctx.closePath();
+    }
+
+    function drawCyberpunkBg() {
+      time += 0.016;
+
+      // Clear with fade effect
+      ctx.fillStyle = 'rgba(2, 3, 10, 0.15)';
+      ctx.fillRect(0, 0, W, H);
+
+      // Draw hexagons
+      hexagons.forEach(hex => {
+        const pulse = Math.sin(time * hex.pulseSpeed + hex.pulseOffset) * 0.5 + 0.5;
+        const opacity = hex.opacity * (0.5 + pulse * 0.5);
+
+        drawHexagon(hex.x, hex.y, hexSize * 0.8);
+        ctx.strokeStyle = `rgba(0, 255, 156, ${opacity * 0.15})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      });
+
+      // Draw circuit connections
+      nodes.forEach((node, i) => {
+        node.x += node.vx;
+        node.y += node.vy;
+        node.pulse += 0.05;
+
+        if(node.x < 0 || node.x > W) node.vx *= -1;
+        if(node.y < 0 || node.y > H) node.vy *= -1;
+
+        // Draw connections to nearby nodes
+        nodes.forEach((other, j) => {
+          if(i < j) {
+            const dx = other.x - node.x;
+            const dy = other.y - node.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if(dist < 180) {
+              const opacity = (1 - dist / 180) * 0.3;
+
+              // Animated pulse along line
+              const pulsePos = (time * 0.5 + i * 0.3) % 1;
+              const px = node.x + dx * pulsePos;
+              const py = node.y + dy * pulsePos;
+
+              ctx.beginPath();
+              ctx.moveTo(node.x, node.y);
+              ctx.lineTo(other.x, other.y);
+              ctx.strokeStyle = `rgba(0, 255, 156, ${opacity})`;
+              ctx.lineWidth = 1;
+              ctx.stroke();
+
+              // Pulse dot
+              ctx.beginPath();
+              ctx.arc(px, py, 2, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(0, 255, 200, ${opacity * 2})`;
+              ctx.fill();
+            }
+          }
+        });
+
+        // Draw node
+        const nodePulse = Math.sin(node.pulse) * 0.5 + 0.5;
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.size, 0, Math.PI * 2);
+        ctx.fillStyle = '#00ff9c';
+        ctx.fill();
+
+        // Node glow
+        const grd = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, node.size * 6);
+        grd.addColorStop(0, `rgba(0, 255, 156, ${0.6 * nodePulse})`);
+        grd.addColorStop(1, 'rgba(0, 255, 156, 0)');
+        ctx.fillStyle = grd;
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.size * 6, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Draw data streams
+      streams.forEach(stream => {
+        stream.y += stream.speed;
+
+        if(stream.y > H + stream.length) {
+          stream.y = -stream.length;
+          stream.x = Math.random() * W;
+        }
+
+        const gradient = ctx.createLinearGradient(stream.x, stream.y - stream.length, stream.x, stream.y);
+        gradient.addColorStop(0, 'rgba(0, 255, 200, 0)');
+        gradient.addColorStop(0.5, `rgba(0, 255, 200, ${stream.opacity})`);
+        gradient.addColorStop(1, 'rgba(0, 255, 156, 0)');
+
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(stream.x, stream.y - stream.length);
+        ctx.lineTo(stream.x, stream.y);
+        ctx.stroke();
+      });
+
+      // Draw floating particles
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if(p.x < 0 || p.x > W) p.vx *= -1;
+        if(p.y < 0 || p.y > H) p.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 255, 156, ${p.opacity})`;
+        ctx.fill();
+      });
+
+      // Scanlines for extra tech feel
+      ctx.strokeStyle = 'rgba(0, 255, 156, 0.02)';
+      ctx.lineWidth = 1;
+      for(let i = 0; i < H; i += 3) {
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(W, i);
+        ctx.stroke();
+      }
+
+      // Random glitch lines
+      if(Math.random() > 0.97) {
+        const y = Math.random() * H;
+        ctx.strokeStyle = `rgba(0, 255, 200, ${Math.random() * 0.3})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(Math.random() * W, y);
+        ctx.stroke();
+      }
+    }
+
+    // Animation loop
+    function loop(){
+      drawCyberpunkBg();
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+
+    // === Simple function placeholders you used earlier (keep safe) ===
+    function sendMessage(){
+      // placeholder: implement your form submit if needed
+      alert('Thanks — message sending not implemented in this demo.');
+    }
+    function closeModal(e){
+      if(e.target.id === 'modal') document.getElementById('modal').style.display = 'none';
+    }
+
+  </script>
 
 </body>
 </html>
