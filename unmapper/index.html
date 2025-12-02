@@ -1,70 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>JS Unmapper</title>
-<style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #0d0d0d; color: #0ff; }
-    textarea, input { width: 100%; padding: 10px; margin: 8px 0; background: #111; color: #0f0; border: 1px solid #0ff; }
-    button { padding: 10px 20px; background: #0ff; border: none; cursor: pointer; font-weight: bold; }
-    pre { background: #111; padding: 15px; white-space: pre-wrap; }
-    .box { border: 1px solid #0ff; padding: 20px; margin-bottom: 20px; }
-</style>
+    <meta charset="UTF-8">
+    <title>JS SourceMap Unmapper</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>JS Unmapper</h1>
+<h2>JS SourceMap Unmapper</h2>
 
-<div class="box">
-    <h2>1️⃣ Unmap using URL</h2>
-    <input type="text" id="mapUrl" placeholder="Enter .map file URL (https://example.com/app.js.map)">
-    <button onclick="fetchMap()">Fetch & Unmap</button>
+<div class="container">
+
+    <!-- URL Mode -->
+    <div>
+        <h3>1. Load SourceMap from URL</h3>
+        <input id="sourcemapUrl" type="text" placeholder="Enter .map file URL">
+        <button onclick="loadFromURL()">Fetch & Unmap</button>
+    </div>
+
+    <hr>
+
+    <!-- Paste Mode -->
+    <div>
+        <h3>2. Paste SourceMap JSON</h3>
+        <textarea id="sourcemapText" placeholder="Paste entire .map JSON here"></textarea>
+        <button onclick="loadFromText()">Unmap Pasted Code</button>
+    </div>
+
 </div>
 
-<div class="box">
-    <h2>2️⃣ Unmap using pasted source map JSON</h2>
-    <textarea id="mapText" rows="10" placeholder="Paste source map JSON here"></textarea>
-    <button onclick="unmapFromText()">Unmap JSON</button>
-</div>
-
-<h2>Output:</h2>
 <pre id="output"></pre>
 
-<script src="https://cdn.jsdelivr.net/npm/source-map@0.7.4/dist/source-map.min.js"></script>
-
-<script>
-async function fetchMap() {
-    const url = document.getElementById("mapUrl").value.trim();
-    if (!url) return alert("Enter a URL!");
-
-    try {
-        const res = await fetch(url);
-        if (!res.ok) return alert("Failed to fetch .map file");
-
-        const json = await res.json();
-        unmap(json);
-    } catch (err) {
-        alert("Error fetching map: " + err);
-    }
-}
-
-function unmapFromText() {
-    const text = document.getElementById("mapText").value.trim();
-    if (!text) return alert("Paste source map JSON!");
-
-    try {
-        const json = JSON.parse(text);
-        unmap(json);
-    } catch (err) {
-        alert("Invalid JSON: " + err);
-    }
-}
-
-async function unmap(mapJson) {
-    document.getElementById("output").textContent = "Processing...";
-
-    const consumer = await new sourceMap.SourceMapConsumer(mapJson);
-    let result = "";
-
-    consumer.eachMapping(m => {
-        result += `${m.generatedLine}:$
+<script src="script.js"></script>
+</body>
+</html>
