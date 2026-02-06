@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h3>Profile Bio</h3>
+<div id="bio"></div>
+
+<script>
+  const data = location.search.slice(1); // take everything after '?'
+
+  function render(input) {
+    const tpl = `
+      <div class="card">
+        <h4>User Bio</h4>
+      </div>
+    `;
+
+    document.getElementById("bio").innerHTML = tpl;
+
+    // Filter out <script> and any on* attributes
+    document.getElementById("bio").insertAdjacentHTML(
+      "beforeend",
+      input.replace(/script/gi, "").replace(/on\w+=/gi, "").replace(/[\r\n]/g, ""));
+  }
+
+  if (data) {
+    render(decodeURIComponent(data));
+  }
+</script>
+
+</body>
+</html>
