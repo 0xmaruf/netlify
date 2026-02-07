@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <body>
-<h3>Hey Hacker , can u pop up here??</h3>
+<h3>Profile Bio</h3>
 <div id="bio"></div>
 <script>
   const data = location.search.slice(1);
@@ -14,7 +14,7 @@
     document.getElementById("bio").innerHTML = tpl;
     document.getElementById("bio").insertAdjacentHTML(
       "beforeend",
-      input.replace(/[\r\n]/g, "").replace(/on\w+=/gi, "").replace(/script/gi, "")
+      input.replace(/[\r\n]/g, "").replace(/on\w+=/gi, "").replace(/script/gi, "x").replace(/<a/gi, "x")
     );
   }
   if (data) {
