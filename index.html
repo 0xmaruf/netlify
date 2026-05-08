@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>0xmaruf — Security Researcher & Bug Bounty Hunter</title>
+    <meta name="description" content="Md Maruf Hosan aka 0xmaruf — Security researcher, bug bounty hunter and CTF player. I break systems to make them safer.">
+
+    <!-- Preconnect for fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        primary: '#00ff88',
+                        secondary: '#00d4aa',
+                        dark: '#0a0a0f',
+                        darker: '#050508',
+                        surface: '#12121a',
+                        'surface-light': '#1a1a25',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 5s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-15px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0a0a0f;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-tap-highlight-color: rgba(0, 255, 136, 0.1);
+            touch-action: pan-y;
+        }
+
+        /* Mobile touch optimization */
+        @media (hover: none) and (pointer: coarse) {
+            .hover-lift:active {
+                transform: translateY(-2px) scale(0.98);
+                box-shadow: 0 8px 16px -8px rgba(0, 255, 136, 0.15);
+            }
+
+            a:active, button:active {
+                opacity: 0.8;
+            }
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #00ff88 0%, #00d4aa 50%, #00ff88 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .glass {
+            background: rgba(18, 18, 26, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glow-border {
+            position: relative;
+        }
+
+        .glow-border::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, #00ff88, transparent, #00d4aa);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .hover-lift {
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px -12px rgba(0, 255, 136, 0.12);
+        }
+
+        /* ===== HACKING VIBE BACKGROUND ===== */
+        .hacker-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        /* Hex grid pattern */
+        .hex-grid {
+            position: absolute;
+            inset: -50%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%2300ff88' fill-opacity='0.03'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-7.5L27.99 34H28v2.31h-.01L17 42.65V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.6;
+            animation: drift 120s linear infinite;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(28px, 49px); }
+        }
+
+        /* Circuit traces */
+        .circuit-lines {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(90deg, transparent 98%, rgba(0, 255, 136, 0.04) 98%, rgba(0, 255, 136, 0.04) 100%, transparent 100%),
+                linear-gradient(0deg, transparent 98%, rgba(0, 255, 136, 0.04) 98%, rgba(0, 255, 136, 0.04) 100%, transparent 100%);
+            background-size: 120px 120px;
+        }
+
+        /* Glowing nodes at intersections */
+        .circuit-nodes {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle at 120px 120px, rgba(0, 255, 136, 0.08) 0%, transparent 3%);
+            background-size: 120px 120px;
+        }
+
+        /* Floating binary/code particles */
+        .code-particles {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+
+        .code-particles::before,
+        .code-particles::after {
+            content: '0101 0xFF 0xA4 1010 0xDE 1100 0x00 0x88 0011 0xAB 0x12 0100';
+            position: absolute;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: rgba(0, 255, 136, 0.04);
+            white-space: nowrap;
+            letter-spacing: 0.3em;
+            line-height: 2.5;
+        }
+
+        .code-particles::before {
+            top: 10%;
+            left: -10%;
+            animation: scroll-left 80s linear infinite;
+        }
+
+        .code-particles::after {
+            bottom: 15%;
+            right: -10%;
+            animation: scroll-right 100s linear infinite;
+        }
+
+        @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        @keyframes scroll-right {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(50%); }
+        }
+
+        /* Subtle radial glow from center */
+        .center-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* Vignette */
+        .vignette {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, transparent 0%, #0a0a0f 80%);
+            pointer-events: none;
+        }
+
+        /* Profile image ring */
+        .profile-ring {
+            position: relative;
+            border-radius: 50%;
+            padding: 4px;
+            background: linear-gradient(135deg, #00ff88, #00d4aa, #00ff88);
+        }
+
+        .profile-ring::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00ff88, transparent, #00d4aa);
+            opacity: 0.4;
+            filter: blur(8px);
+            z-index: -1;
+        }
+
+        .profile-ring img {
+            border-radius: 50%;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #0a0a0f;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a0f;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1a1a25;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00ff88;
+        }
+
+        /* Fast fade-in */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Section alignment helper */
+        .section-container {
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .section-container {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .section-container {
+                padding-left: 3rem;
+                padding-right: 3rem;
+            }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="antialiased">
+
+    <!-- ===== HACKING VIBE BACKGROUND ===== -->
+    <div class="hacker-bg">
+        <div class="hex-grid"></div>
+        <div class="circuit-lines"></div>
+        <div class="circuit-nodes"></div>
+        <div class="code-particles"></div>
+        <div class="center-glow"></div>
+        <div class="vignette"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass border-b border-white/5">
+        <div class="section-container">
+            <div class="flex items-center justify-between h-16">
+                <a href="#" class="flex items-center gap-2 shrink-0">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-primary"></i>
+                    <span class="font-mono font-bold text-lg tracking-tight">0xmaruf</span>
+                </a>
+
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#about" class="text-sm font-medium text-gray-400 hover:text-primary transition-colors duration-200">About</a>
+                    <a href="#platforms" class="text-sm font-medium text-gray-400 hover:text-primary transition-colors duration-200">Platforms</a>
+                    <a href="#writeups" class="text-sm font-medium text-gray-400 hover:text-primary transition-colors duration-200">Writeups</a>
+                    <a href="#hof" class="text-sm font-medium text-gray-400 hover:text-primary transition-colors duration-200">Hall of Fame/Certifications</a>
+                    <a href="#events" class="text-sm font-medium text-gray-400 hover:text-primary transition-colors duration-200">Events</a>
+                    <a href="#contact" class="px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all duration-200 text-sm font-medium">Contact</a>
+                </div>
+
+                <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg hover:bg-white/5 transition-colors">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden glass border-t border-white/5">
+            <div class="section-container py-3 space-y-1">
+                <a href="#about" class="block px-3 py-2.5 rounded-md text-sm font-medium text-gray-400 hover:text-primary hover:bg-white/5 transition-colors">About</a>
+                <a href="#platforms" class="block px-3 py-2.5 rounded-md text-sm font-medium text-gray-400 hover:text-primary hover:bg-white/5 transition-colors">Platforms</a>
+                <a href="#writeups" class="block px-3 py-2.5 rounded-md text-sm font-medium text-gray-400 hover:text-primary hover:bg-white/5 transition-colors">Writeups</a>
+                <a href="#hof" class="block px-3 py-2.5 rounded-md text-sm font-medium text-gray-400 hover:text-primary hover:bg-white/5 transition-colors">Hall of Fame</a>
+                <a href="#events" class="block px-3 py-2.5 rounded-md text-sm font-medium text-gray-400 hover:text-primary hover:bg-white/5 transition-colors">Events</a>
+                <a href="#contact" class="block px-3 py-2.5 rounded-md text-sm font-medium text-primary">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-[90vh] flex items-center pt-20">
+        <div class="section-container relative w-full">
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+
+                <!-- Left: Text Content -->
+                <div class="order-2 lg:order-1 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 border border-primary/20 text-primary text-sm font-mono mb-6 animate-pulse-slow">
+                        <span class="w-2 h-2 rounded-full bg-primary"></span>
+                        Available for Bug Bounty & Security Research
+                    </div>
+
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+                        Hi, I am <span class="gradient-text">Md Maruf Hosan</span>
+                    </h1>
+                    <p class="text-xl sm:text-2xl text-gray-400 font-mono mb-4">aka 0xmaruf</p>
+
+                    <p class="text-lg text-gray-400 mb-6 max-w-xl mx-auto lg:mx-0">
+                        I break systems to make them safer. Security researcher, bug bounty hunter and sometimes CTF player.
+                    </p>
+
+                    <p class="text-gray-500 mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+                        I research web applications, find bugs in the wild and write detailed writeups so others can learn. 
+                        My focus is on practical exploitation, automation for recon and responsible disclosure.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                        <a href="#writeups" class="px-8 py-3.5 rounded-full bg-primary text-dark font-bold hover:bg-primary/90 transition-all duration-200 hover:scale-[1.02] flex items-center justify-center gap-2 text-sm">
+                            <i data-lucide="book-open" class="w-4 h-4"></i>
+                            Read Writeups
+                        </a>
+                        <a href="#contact" class="px-8 py-3.5 rounded-full border border-white/20 text-white font-medium hover:bg-white/5 transition-all duration-200 flex items-center justify-center gap-2 text-sm">
+                            <i data-lucide="mail" class="w-4 h-4"></i>
+                            Get in Touch
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right: Circular Profile Photo -->
+                <div class="order-1 lg:order-2 flex justify-center lg:justify-end">
+                    <div class="relative" id="profileContainer">
+                        <!-- Background glow -->
+                        <div class="absolute inset-0 bg-primary/10 rounded-full blur-3xl scale-110 transition-all duration-300" id="profileGlow"></div>
+
+                        <!-- Profile Image with Ring -->
+                        <div class="profile-ring w-56 h-56 sm:w-64 sm:h-64 lg:w-72 lg:h-72 transition-all duration-300" id="profileImage" style="transform-style: preserve-3d;">
+                            <img
+                                src="https://pbs.twimg.com/profile_images/1859027790026444800/EcrBZ0On_400x400.jpg"
+                                alt="Md Maruf Hosan - 0xmaruf"
+                                loading="eager"
+                                decoding="async"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                            >
+                            <!-- Fallback -->
+                            <div class="hidden w-full h-full rounded-full bg-surface items-center justify-center">
+                                <div class="text-center">
+                                    <i data-lucide="user" class="w-16 h-16 text-gray-600 mx-auto mb-2"></i>
+                                    <p class="text-xs text-gray-500 font-mono">Add your photo</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Floating badge -->
+                        <div class="absolute -bottom-2 -right-2 bg-surface border border-primary/30 rounded-xl px-4 py-2 shadow-xl transition-all duration-300" id="profileBadge">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+                                <span class="text-xs font-mono text-primary font-semibold">Web Application Pentester</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="mt-16 lg:mt-20 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto lg:mx-0">
+                <div class="p-5 rounded-2xl glass hover-lift text-center lg:text-left">
+                    <div class="text-2xl lg:text-3xl font-bold text-primary font-mono">50+</div>
+                    <div class="text-xs text-gray-500 mt-1">Valid Reports</div>
+                </div>
+                <div class="p-5 rounded-2xl glass hover-lift text-center lg:text-left">
+                    <div class="text-2xl lg:text-3xl font-bold text-primary font-mono">15+</div>
+                    <div class="text-xs text-gray-500 mt-1">Hall of Fame</div>
+                </div>
+                <div class="p-5 rounded-2xl glass hover-lift text-center lg:text-left">
+                    <div class="text-2xl lg:text-3xl font-bold text-primary font-mono">3</div>
+                    <div class="text-xs text-gray-500 mt-1">Critical Findings</div>
+                </div>
+                <div class="p-5 rounded-2xl glass hover-lift text-center lg:text-left">
+                    <div class="text-2xl lg:text-3xl font-bold text-primary font-mono">100%</div>
+                    <div class="text-xs text-gray-500 mt-1">Responsible Disclosure</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 lg:py-24">
+        <div class="section-container">
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+                <div>
+                    <h2 class="text-3xl lg:text-4xl font-bold mb-6">
+                        About <span class="gradient-text">Me</span>
+                    </h2>
+                    <div class="space-y-4 text-gray-400 leading-relaxed">
+                        <p>
+                            I'm a passionate security researcher specializing in web application security. My journey in cybersecurity 
+                            started with CTF competitions and evolved into professional bug bounty hunting.
+                        </p>
+                        <p>
+                            I enjoy playing CTFs and building tools that save time during recon. My approach combines manual 
+                            testing expertise with automation to find vulnerabilities that others might miss.
+                        </p>
+                        <p>
+                            When I'm not hunting bugs, I write detailed writeups to help the community learn from my findings. 
+                            I believe in responsible disclosure and making the internet a safer place, one vulnerability at a time.
+                        </p>
+                    </div>
+
+                    <!-- Skills Section -->
+                    <div class="mt-8 space-y-6">
+                        <!-- Bug Bounty Skills -->
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                                Skills
+                            </h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-mono border border-primary/20">Web Security</span>
+                                <span class="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-mono border border-primary/20">API Security</span>
+                                <span class="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-mono border border-primary/20">Pentesting</span>
+                                <span class="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-mono border border-primary/20">Automation</span>
+                                <span class="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-mono border border-primary/20">OSINT</span>
+                                <span class="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-mono border border-primary/20">Code Analysis</span>
+                                <span class="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-mono border border-primary/20">Android Pentesting</span>
+                            </div>
+                        </div>
+
+                        <!-- Tools -->
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <i data-lucide="wrench" class="w-3.5 h-3.5"></i>
+                                Tools
+                            </h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-400 text-xs font-mono border border-blue-500/20">Burp Suite</span>
+                                <span class="px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-400 text-xs font-mono border border-blue-500/20">Nuclei</span>
+                                <span class="px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-400 text-xs font-mono border border-blue-500/20">ffuf</span>
+                                <span class="px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-400 text-xs font-mono border border-blue-500/20">Subfinder</span>
+                                <span class="px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-400 text-xs font-mono border border-blue-500/20">httpx</span>
+                                <span class="px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-400 text-xs font-mono border border-blue-500/20">Katana</span>
+                                <span class="px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-400 text-xs font-mono border border-blue-500/20">Remote Server</span>
+                                <span class="px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-400 text-xs font-mono border border-blue-500/20">nmap</span>
+                                <span class="px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-400 text-xs font-mono border border-blue-500/20">Custom Tools</span>
+                            </div>
+                        </div>
+
+                        <!-- Programming -->
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <i data-lucide="code" class="w-3.5 h-3.5"></i>
+                                Programming
+                            </h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1.5 rounded-full bg-yellow-500/10 text-yellow-400 text-xs font-mono border border-yellow-500/20">JavaScript</span>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <div class="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-3xl blur-3xl"></div>
+                    <div class="relative glass rounded-3xl p-6 lg:p-8 glow-border">
+                        <h3 class="text-lg font-bold mb-5 flex items-center gap-2">
+                            <i data-lucide="target" class="w-5 h-5 text-primary"></i>
+                            Expertise Highlights
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] transition-colors duration-200 cursor-pointer">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-lg bg-primary/15 flex items-center justify-center shrink-0">
+                                        <i data-lucide="globe" class="w-4 h-4 text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-sm">Web Application Security</div>
+                                        <div class="text-xs text-gray-500">OWASP Top 10 & Beyond</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-600"></i>
+                            </div>
+
+                            <div class="flex items-center justify-between p-3.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] transition-colors duration-200 cursor-pointer">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-lg bg-primary/15 flex items-center justify-center shrink-0">
+                                        <i data-lucide="zap" class="w-4 h-4 text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-sm">API Testing</div>
+                                        <div class="text-xs text-gray-500">REST, GraphQL, WebSocket</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-600"></i>
+                            </div>
+
+                            <div class="flex items-center justify-between p-3.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] transition-colors duration-200 cursor-pointer">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-lg bg-primary/15 flex items-center justify-center shrink-0">
+                                        <i data-lucide="search" class="w-4 h-4 text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-sm">Recon Automation</div>
+                                        <div class="text-xs text-gray-500">Custom Scripts & Tools</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-600"></i>
+                            </div>
+
+                            <div class="flex items-center justify-between p-3.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] transition-colors duration-200 cursor-pointer">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-lg bg-primary/15 flex items-center justify-center shrink-0">
+                                        <i data-lucide="smartphone" class="w-4 h-4 text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-sm">Mobile Security</div>
+                                        <div class="text-xs text-gray-500">Android Penetration Testing</div>
+                                    </div>
+                                </div>
+                                <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Platforms Section -->
+    <section id="platforms" class="py-20 lg:py-24">
+        <div class="section-container">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl lg:text-4xl font-bold mb-3">Platforms I <span class="gradient-text">Hunt On</span></h2>
+                <p class="text-gray-400 max-w-xl mx-auto text-sm">Active on major bug bounty platforms, consistently finding and responsibly disclosing vulnerabilities.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <a href="https://hackerone.com/0xmaruf" target="_blank" class="group glass rounded-2xl p-6 lg:p-8 hover-lift glow-border overflow-hidden block">
+                    <div class="flex items-center justify-between mb-5">
+                        <div class="w-12 h-12 rounded-xl bg-[#494649]/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                            <i data-lucide="shield" class="w-6 h-6 text-primary"></i>
+                        </div>
+                        <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-600 group-hover:text-primary transition-colors duration-200"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">HackerOne</h3>
+                    <p class="text-sm text-gray-400 mb-4">Mostly I hunt here. Active hunter with multiple valid submissions.</p>
+                    <span class="text-xs font-mono text-primary">@0xmaruf</span>
+                </a>
+
+                <a href="https://bugcrowd.com/0xmaruf" target="_blank" class="group glass rounded-2xl p-6 lg:p-8 hover-lift glow-border overflow-hidden block">
+                    <div class="flex items-center justify-between mb-5">
+                        <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                            <i data-lucide="bug" class="w-6 h-6 text-orange-400"></i>
+                        </div>
+                        <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-600 group-hover:text-orange-400 transition-colors duration-200"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Bugcrowd</h3>
+                    <p class="text-sm text-gray-400 mb-4">Participating in various programs and submitting quality reports.</p>
+                    <span class="text-xs font-mono text-orange-400">@0xmaruf</span>
+                </a>
+
+                <a href="https://yeswehack.com/hunters/0xmaruf" target="_blank" class="group glass rounded-2xl p-6 lg:p-8 hover-lift glow-border overflow-hidden block">
+                    <div class="flex items-center justify-between mb-5">
+                        <div class="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+                            <i data-lucide="target" class="w-6 h-6 text-red-400"></i>
+                        </div>
+                        <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-600 group-hover:text-red-400 transition-colors duration-200"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">YesWeHack</h3>
+                    <p class="text-sm text-gray-400 mb-4">European platform engagement with diverse program targets.</p>
+                    <span class="text-xs font-mono text-red-400">@0xmaruf</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Writeups Section -->
+    <section id="writeups" class="py-20 lg:py-24">
+        <div class="section-container">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4">
+                <div>
+                    <h2 class="text-3xl lg:text-4xl font-bold mb-2">Security <span class="gradient-text">Writeups</span></h2>
+                    <p class="text-gray-400 text-sm">Detailed technical writeups to help the community learn.</p>
+                </div>
+                <button class="px-5 py-2.5 rounded-full border border-white/20 text-sm font-medium hover:bg-white/5 transition-all duration-200 flex items-center gap-2 shrink-0">
+                    View All
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4">
+                <article class="group glass rounded-2xl p-5 lg:p-6 hover-lift cursor-pointer fade-in">
+                    <div class="flex items-start justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 text-xs font-mono border border-red-500/20">Account Takeover</span>
+                        <span class="text-gray-500 text-xs">Jan 2025</span>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2 group-hover:text-primary transition-colors duration-200">Firing 8 Account Takeover Methods</h3>
+                    <p class="text-sm text-gray-400 mb-4 line-clamp-2">Comprehensive guide covering 8 different account takeover methods with practical examples and exploitation techniques.</p>
+                    <div class="flex items-center gap-4 text-xs text-gray-500">
+                        <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5"></i> 15 min</span>
+                        <span class="flex items-center gap-1"><i data-lucide="eye" class="w-3.5 h-3.5"></i> 2.4k views</span>
+                    </div>
+                </article>
+
+                <article class="group glass rounded-2xl p-5 lg:p-6 hover-lift cursor-pointer fade-in">
+                    <div class="flex items-start justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-mono border border-blue-500/20">JavaScript</span>
+                        <span class="text-gray-500 text-xs">Dec 2024</span>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2 group-hover:text-primary transition-colors duration-200">Grep Tips for JavaScript Analysis</h3>
+                    <p class="text-sm text-gray-400 mb-4 line-clamp-2">Essential grep commands and patterns for bug bounty hunters to analyze JavaScript files for sensitive endpoints and secrets.</p>
+                    <div class="flex items-center gap-4 text-xs text-gray-500">
+                        <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5"></i> 8 min</span>
+                        <span class="flex items-center gap-1"><i data-lucide="eye" class="w-3.5 h-3.5"></i> 1.8k views</span>
+                    </div>
+                </article>
+
+                <article class="group glass rounded-2xl p-5 lg:p-6 hover-lift cursor-pointer fade-in">
+                    <div class="flex items-start justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 text-xs font-mono border border-purple-500/20">Tools</span>
+                        <span class="text-gray-500 text-xs">Nov 2024</span>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2 group-hover:text-primary transition-colors duration-200">Don't You Have Burp Suite Pro?</h3>
+                    <p class="text-sm text-gray-400 mb-4 line-clamp-2">Tips and tricks for Burp Suite Community Edition users to maximize their testing capabilities without the Pro version.</p>
+                    <div class="flex items-center gap-4 text-xs text-gray-500">
+                        <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5"></i> 10 min</span>
+                        <span class="flex items-center gap-1"><i data-lucide="eye" class="w-3.5 h-3.5"></i> 3.1k views</span>
+                    </div>
+                </article>
+
+                <article class="group glass rounded-2xl p-5 lg:p-6 hover-lift cursor-pointer fade-in">
+                    <div class="flex items-start justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded-full bg-yellow-500/10 text-yellow-400 text-xs font-mono border border-yellow-500/20">Salesforce</span>
+                        <span class="text-gray-500 text-xs">Oct 2024</span>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2 group-hover:text-primary transition-colors duration-200">Hacking on Private Program Using Salesforce CRM</h3>
+                    <p class="text-sm text-gray-400 mb-4 line-clamp-2">Case study of finding vulnerabilities in a private program that utilizes Salesforce CRM infrastructure.</p>
+                    <div class="flex items-center gap-4 text-xs text-gray-500">
+                        <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5"></i> 12 min</span>
+                        <span class="flex items-center gap-1"><i data-lucide="eye" class="w-3.5 h-3.5"></i> 1.5k views</span>
+                    </div>
+                </article>
+
+                <article class="group glass rounded-2xl p-5 lg:p-6 hover-lift cursor-pointer md:col-span-2 fade-in">
+                    <div class="flex items-start justify-between mb-3">
+                        <span class="px-2.5 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-mono border border-green-500/20">Case Study</span>
+                        <span class="text-gray-500 text-xs">Sep 2024</span>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2 group-hover:text-primary transition-colors duration-200">Found Vulnerability on Fiverr</h3>
+                    <p class="text-sm text-gray-400 mb-4">Simple restriction bypass on Fiverr platform. A detailed walkthrough of identifying and exploiting access control issues on a major marketplace platform.</p>
+                    <div class="flex items-center gap-4 text-xs text-gray-500">
+                        <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5"></i> 6 min</span>
+                        <span class="flex items-center gap-1"><i data-lucide="eye" class="w-3.5 h-3.5"></i> 4.2k views</span>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hall of Fame & Certifications Section -->
+    <section id="hof" class="py-20 lg:py-24">
+        <div class="section-container">
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/10 text-yellow-400 text-sm font-mono border border-yellow-500/20 mb-4">
+                    <i data-lucide="trophy" class="w-4 h-4"></i>
+                    Recognitions
+                </div>
+                <h2 class="text-3xl lg:text-4xl font-bold mb-3">Hall of Fame & <span class="gradient-text">Certifications</span></h2>
+                <p class="text-gray-400 max-w-xl mx-auto text-sm">Acknowledged by industry-leading companies for responsible security disclosures and continuous professional development.</p>
+            </div>
+
+            <!-- Certifications -->
+            <div class="mb-14">
+                <h3 class="text-lg font-bold mb-5 flex items-center gap-2">
+                    <i data-lucide="award" class="w-5 h-5 text-primary"></i>
+                    Certifications
+                </h3>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="glass rounded-2xl p-6 hover-lift border-l-4 border-l-primary fade-in">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center">
+                                <i data-lucide="shield-check" class="w-5 h-5 text-primary"></i>
+                            </div>
+                            <span class="px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-mono">Active</span>
+                        </div>
+                        <h4 class="font-bold mb-1">eJPT</h4>
+                        <p class="text-xs text-gray-400 mb-1">eLearnSecurity Junior Penetration Tester</p>
+                        <p class="text-xs text-gray-600">INE | eLearnSecurity</p>
+                    </div>
+
+                    <div class="glass rounded-2xl p-6 hover-lift border-l-4 border-l-blue-500 fade-in">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-blue-500/15 flex items-center justify-center">
+                                <i data-lucide="network" class="w-5 h-5 text-blue-500"></i>
+                            </div>
+                            <span class="px-2 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-mono">Active</span>
+                        </div>
+                        <h4 class="font-bold mb-1">PNPT</h4>
+                        <p class="text-xs text-gray-400 mb-1">Practical Network Penetration Tester</p>
+                        <p class="text-xs text-gray-600">TCM Security</p>
+                    </div>
+
+                    <div class="glass rounded-2xl p-6 hover-lift border-l-4 border-l-purple-500 fade-in">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-purple-500/15 flex items-center justify-center">
+                                <i data-lucide="bug" class="w-5 h-5 text-purple-500"></i>
+                            </div>
+                            <span class="px-2 py-1 rounded-full bg-purple-500/10 text-purple-400 text-xs font-mono">Active</span>
+                        </div>
+                        <h4 class="font-bold mb-1">BBH</h4>
+                        <p class="text-xs text-gray-400 mb-1">Bug Bounty Hunter</p>
+                        <p class="text-xs text-gray-600">HackerOne / Bugcrowd</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hall of Fame Companies -->
+            <div>
+                <h3 class="text-lg font-bold mb-5 flex items-center gap-2">
+                    <i data-lucide="crown" class="w-5 h-5 text-yellow-400"></i>
+                    Hall of Fame
+                </h3>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 justify-items-center">
+                    <!-- Uber -->
+                    <div class="glass rounded-xl p-6 text-center hover-lift group cursor-pointer fade-in flex flex-col items-center w-full h-[180px]">
+                        <div class="w-28 h-28 mx-auto mb-3 rounded-lg bg-white/[0.00] flex items-center justify-center group-hover:bg-white/[0.12] transition-colors duration-200 p-3">
+                            <img src="https://raw.githubusercontent.com/0xmaruf/netlify/refs/heads/main/idx5jwDz9K_1778169626728.png" alt="Uber" class="w-full h-full object-contain" onerror="this.src=''">
+                        </div>
+                        <h4 class="font-bold text-sm">Uber</h4>
+                    </div>
+
+                    <!-- Dell -->
+                    <div class="glass rounded-xl p-6 text-center hover-lift group cursor-pointer fade-in flex flex-col items-center w-full h-[180px]">
+                        <div class="w-28 h-28 mx-auto mb-3 rounded-lg bg-white/[0.00] flex items-center justify-center group-hover:bg-white/[0.12] transition-colors duration-200 p-3">
+                            <img src="https://www.logo.wine/a/logo/Dell/Dell-Logo.wine.svg" alt="Dell" class="w-full h-full object-contain" onerror="this.src=''">
+                        </div>
+                        <h4 class="font-bold text-sm">Dell</h4>
+                    </div>
+
+                    <!-- IBM -->
+                    <div class="glass rounded-xl p-6 text-center hover-lift group cursor-pointer fade-in flex flex-col items-center w-full h-[180px]">
+                        <div class="w-28 h-28 mx-auto mb-3 rounded-lg bg-white/[0.00] flex items-center justify-center group-hover:bg-white/[0.12] transition-colors duration-200 p-3">
+                            <img src="https://download.logo.wine/logo/IBM/IBM-Logo.wine.png" alt="IBM" class="w-full h-full object-contain" onerror="this.src=''">
+                        </div>
+                        <h4 class="font-bold text-sm">IBM</h4>
+                    </div>
+
+                    <!-- US Dept of Defense -->
+                    <div class="glass rounded-xl p-6 text-center hover-lift group cursor-pointer fade-in flex flex-col items-center w-full h-[180px]">
+                        <div class="w-28 h-28 mx-auto mb-3 rounded-lg bg-white/[0.00] flex items-center justify-center group-hover:bg-white/[0.12] transition-colors duration-200 p-3">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Seal_of_the_United_States_Department_of_War_%282025%29.svg/1280px-Seal_of_the_United_States_Department_of_War_%282025%29.svg.png" alt="US Dept of Defense" class="w-full h-full object-contain" onerror="this.src=''">
+                        </div>
+                        <h4 class="font-bold text-sm">US Department of Defense</h4>
+                    </div>
+
+                    <!-- Toyota -->
+                    <div class="glass rounded-xl p-6 text-center hover-lift group cursor-pointer fade-in flex flex-col items-center w-full h-[180px]">
+                        <div class="w-28 h-28 mx-auto mb-3 rounded-lg bg-white/[0.00] flex items-center justify-center group-hover:bg-white/[0.12] transition-colors duration-200 p-3">
+                            <img src="https://download.logo.wine/logo/Toyota_Canada_Inc./Toyota_Canada_Inc.-Logo.wine.png" alt="Toyota" class="w-full h-full object-contain" onerror="this.src=''">
+                        </div>
+                        <h4 class="font-bold text-sm">Toyota</h4>
+                    </div>
+
+                    <!-- Fiverr -->
+                    <div class="glass rounded-xl p-6 text-center hover-lift group cursor-pointer fade-in flex flex-col items-center w-full h-[180px]">
+                        <div class="w-28 h-28 mx-auto mb-3 rounded-lg bg-white/[0.00] flex items-center justify-center group-hover:bg-white/[0.12] transition-colors duration-200 p-3">
+                            <img src="https://iconlogovector.com/uploads/images/2024/12/lg-67655e9e8ddc3-Fiverr.webp" alt="Fiverr" class="w-full h-full object-contain" onerror="this.src=''">
+                        </div>
+                        <h4 class="font-bold text-sm">Fiverr</h4>
+                    </div>
+
+                    <!-- dutch gov -->
+                    <div class="glass rounded-xl p-6 text-center hover-lift group cursor-pointer fade-in flex flex-col items-center w-full h-[180px]">
+                        <div class="w-28 h-28 mx-auto mb-3 rounded-lg bg-white/[0.00] flex items-center justify-center group-hover:bg-white/[0.12] transition-colors duration-200 p-3">
+                            <img src="https://raw.githubusercontent.com/0xmaruf/netlify/07366388e8df6717c9b7decef583c53694bda490/idFkUtiviB_logos.svg" alt="Dutch Government" class="w-full h-full object-contain" onerror="this.src=''">
+                        </div>
+                        <h4 class="font-bold text-sm">Dutch Government</h4>
+                    </div>
+
+                    <!-- More companies -->
+                    <div class="glass rounded-xl p-6 text-center hover-lift group cursor-pointer fade-in flex flex-col items-center w-full h-[180px]">
+                        <div class="w-28 h-28 mx-auto mb-3 rounded-lg bg-white/[0.00] flex items-center justify-center group-hover:bg-white/[0.12] transition-colors duration-200">
+                            <i data-lucide="more-horizontal" class="w-6 h-6 text-gray-500 group-hover:text-primary transition-colors"></i>
+                        </div>
+                        <h4 class="font-bold text-sm">+10 More</h4>
+                        <p class="text-xs text-gray-500 mt-1">Various</p>
+                    </div>
+                </div>
+
+                <!-- Stats Banner -->
+                <div class="mt-10 glass rounded-2xl p-6 lg:p-8 glow-border fade-in">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                        <div>
+                            <div class="text-2xl lg:text-3xl font-bold text-primary font-mono">15+</div>
+                            <div class="text-xs text-gray-500 mt-1">Companies</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl lg:text-3xl font-bold text-primary font-mono">50+</div>
+                            <div class="text-xs text-gray-500 mt-1">Valid Reports</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl lg:text-3xl font-bold text-primary font-mono">3</div>
+                            <div class="text-xs text-gray-500 mt-1">Critical</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl lg:text-3xl font-bold text-primary font-mono">100%</div>
+                            <div class="text-xs text-gray-500 mt-1">Responsible</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Section -->
+    <section id="events" class="py-20 lg:py-24">
+        <div class="section-container">
+            <div class="mb-12">
+                <h2 class="text-3xl lg:text-4xl font-bold mb-2">Events & <span class="gradient-text">Swags</span></h2>
+                <p class="text-gray-400 text-sm">Conferences, CTFs, and community engagements.</p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="glass rounded-2xl p-5 lg:p-6 flex flex-col md:flex-row gap-5 items-start md:items-center hover-lift fade-in">
+                    <div class="flex-shrink-0 w-14 h-14 rounded-xl bg-primary/15 flex items-center justify-center">
+                        <i data-lucide="trophy" class="w-7 h-7 text-primary"></i>
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <div class="flex flex-wrap items-center gap-2 mb-1">
+                            <h3 class="font-bold text-slate-100">HackerOne Bug Hunt 2025</h3>
+                            <span class="px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 text-xs font-mono border border-yellow-500/20">Finalist</span>
+                        </div>
+                        <p class="text-sm text-gray-400">Competed against top security researchers worldwide and reached the finals.</p>
+                    </div>
+                    <div class="flex-shrink-0 text-right md:ml-4">
+                        <div class="text-sm font-mono text-primary">Mar 12, 2025</div>
+                        <div class="text-xs text-gray-600">Global</div>
+                    </div>
+                </div>
+
+                <div class="glass rounded-2xl p-5 lg:p-6 flex flex-col md:flex-row gap-5 items-start md:items-center hover-lift fade-in">
+                    <div class="flex-shrink-0 w-14 h-14 rounded-xl bg-blue-500/15 flex items-center justify-center">
+                        <i data-lucide="flag" class="w-7 h-7 text-blue-500"></i>
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <div class="flex flex-wrap items-center gap-2 mb-1">
+                            <h3 class="font-bold text-slate-100">Local CTF Night</h3>
+                            <span class="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-xs font-mono border border-blue-500/20">Organizer</span>
+                        </div>
+                        <p class="text-sm text-gray-400">Organized and hosted a local CTF event for newcomers in cybersecurity.</p>
+                    </div>
+                    <div class="flex-shrink-0 text-right md:ml-4">
+                        <div class="text-sm font-mono text-primary">Sep 21, 2024</div>
+                        <div class="text-xs text-gray-600">Community</div>
+                    </div>
+                </div>
+
+                <div class="glass rounded-2xl p-5 lg:p-6 flex flex-col md:flex-row gap-5 items-start md:items-center hover-lift fade-in">
+                    <div class="flex-shrink-0 w-14 h-14 rounded-xl bg-purple-500/15 flex items-center justify-center">
+                        <i data-lucide="users" class="w-7 h-7 text-purple-500"></i>
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <div class="flex flex-wrap items-center gap-2 mb-1">
+                            <h3 class="font-bold text-slate-100">WebSec Meetup</h3>
+                            <span class="px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 text-xs font-mono border border-purple-500/20">Panelist</span>
+                        </div>
+                        <p class="text-sm text-gray-400">Panel discussion on modern web security threats and responsible disclosure.</p>
+                    </div>
+                    <div class="flex-shrink-0 text-right md:ml-4">
+                        <div class="text-sm font-mono text-primary">Jul 6, 2024</div>
+                        <div class="text-xs text-gray-600">Panel</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Swags & Stickers Gallery -->
+            <div class="mt-14">
+                <h3 class="text-lg font-bold mb-5 flex items-center gap-2">
+                    <i data-lucide="gift" class="w-5 h-5 text-primary"></i>
+                    Conference Highlights
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <!-- Swag Item 1 - Replace with your actual image URL -->
+                    <div class="swag-item group cursor-pointer" onclick="openLightbox(0)">
+                        <div class="aspect-square glass rounded-2xl overflow-hidden hover-lift relative">
+                            <img src="https://raw.githubusercontent.com/0xmaruf/netlify/refs/heads/main/bughunt/photo_2024-11-21_12-57-59.jpg"
+                                 alt="HackerOne Swag"
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                <span class="text-xs text-white font-medium">HackerOne T-Shirt</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Swag Item 2 -->
+                    <div class="swag-item group cursor-pointer" onclick="openLightbox(1)">
+                        <div class="aspect-square glass rounded-2xl overflow-hidden hover-lift relative">
+                            <img src="https://raw.githubusercontent.com/0xmaruf/netlify/refs/heads/main/bughunt/photo_2024-11-20_02-43-37.jpg"
+                                 alt="Security Stickers"
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                <span class="text-xs text-white font-medium">Sticker Collection</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Swag Item 3 -->
+                    <div class="swag-item group cursor-pointer" onclick="openLightbox(2)">
+                        <div class="aspect-square glass rounded-2xl overflow-hidden hover-lift relative">
+                            <img src="https://raw.githubusercontent.com/0xmaruf/netlify/refs/heads/main/bughunt/photo_2024-11-20_02-43-19.jpg"
+                                 alt="Conference Badge"
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                <span class="text-xs text-white font-medium">DEF CON Badge</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Swag Item 4 -->
+                    <div class="swag-item group cursor-pointer" onclick="openLightbox(3)">
+                        <div class="aspect-square glass rounded-2xl overflow-hidden hover-lift relative">
+                            <img src="https://raw.githubusercontent.com/0xmaruf/netlify/refs/heads/main/swags/-bvas0e.jpg"
+                                 alt="Bugcrowd Hoodie"
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                <span class="text-xs text-white font-medium">Bugcrowd Hoodie</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Swag Item 5 -->
+                    <div class="swag-item group cursor-pointer" onclick="openLightbox(4)">
+                        <div class="aspect-square glass rounded-2xl overflow-hidden hover-lift relative">
+                            <img src="https://bughunt.info/wp-content/uploads/2025/05/DSC01226-scaled.jpg"
+                                 alt="Event Photo"
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                <span class="text-xs text-white font-medium">Security Conference</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Swag Item 6 -->
+                    <div class="swag-item group cursor-pointer" onclick="openLightbox(5)">
+                        <div class="aspect-square glass rounded-2xl overflow-hidden hover-lift relative">
+                            <img src="https://bughunt.info/wp-content/uploads/2025/05/DSC01147-2048x1365.jpg"
+                                 alt="Swag Collection"
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                <span class="text-xs text-white font-medium">Swag Collection</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Swag Item 7 -->
+                    <div class="swag-item group cursor-pointer" onclick="openLightbox(6)">
+                        <div class="aspect-square glass rounded-2xl overflow-hidden hover-lift relative">
+                            <img src="https://bughunt.info/wp-content/uploads/2025/05/DSC01084-scaled.jpg"
+                                 alt="Event Badge"
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                <span class="text-xs text-white font-medium">H1 Live Event</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Swag Item 8 -->
+                    <div class="swag-item group cursor-pointer" onclick="openLightbox(7)">
+                        <div class="aspect-square glass rounded-2xl overflow-hidden hover-lift relative">
+                            <img src="https://bughunt.info/wp-content/uploads/2025/06/DSC00639-scaled.jpg"
+                                 alt="More Swag"
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                <span class="text-xs text-white font-medium">Exclusive Merch</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lightbox Modal -->
+            <div id="lightbox" class="fixed inset-0 bg-black/95 z-50 hidden items-center justify-center p-4" onclick="closeLightbox()">
+                <button onclick="closeLightbox()" class="absolute top-4 right-4 text-white hover:text-primary transition-colors">
+                    <i data-lucide="x" class="w-8 h-8"></i>
+                </button>
+                <button onclick="event.stopPropagation(); previousImage()" class="absolute left-4 text-white hover:text-primary transition-colors">
+                    <i data-lucide="chevron-left" class="w-8 h-8"></i>
+                </button>
+                <button onclick="event.stopPropagation(); nextImage()" class="absolute right-4 text-white hover:text-primary transition-colors">
+                    <i data-lucide="chevron-right" class="w-8 h-8"></i>
+                </button>
+                <div class="max-w-4xl max-h-[90vh] relative">
+                    <img id="lightboxImage" src="" alt="" class="w-full h-full object-contain rounded-2xl">
+                    <div class="text-center mt-4">
+                        <p id="lightboxCaption" class="text-white text-sm"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-10 text-center">
+                <p class="text-gray-400 text-sm mb-4">Want me to speak or run a workshop?</p>
+                <a href="#contact" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all duration-200 text-sm">
+                    <i data-lucide="mic" class="w-4 h-4"></i>
+                    Invite Me to Speak
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 lg:py-24">
+        <div class="section-container">
+            <div class="max-w-2xl mx-auto">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl lg:text-4xl font-bold mb-3">Get In <span class="gradient-text">Touch</span></h2>
+                    <p class="text-gray-400 text-sm">Have a question or want to collaborate? Drop me a message.</p>
+                </div>
+
+                <div class="glass rounded-3xl p-6 lg:p-10 glow-border">
+                    <!-- Replace YOUR_FORM_ID with your Formspree form ID after signing up at https://formspree.io -->
+                    <form class="space-y-5" action="https://formspree.io/f/xojrnvbe" method="POST" id="contactForm">
+                        <div class="grid md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-400 mb-2">Name</label>
+                                <input type="text" name="name" required class="w-full px-4 py-3 rounded-xl bg-dark border border-white/10 text-white placeholder-gray-600 focus:border-primary/50 transition-colors text-sm" placeholder="Your name">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-400 mb-2">Email</label>
+                                <input type="email" name="email" required class="w-full px-4 py-3 rounded-xl bg-dark border border-white/10 text-white placeholder-gray-600 focus:border-primary/50 transition-colors text-sm" placeholder="you@example.com">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400 mb-2">Subject</label>
+                            <select name="subject" required class="w-full px-4 py-3 rounded-xl bg-dark border border-white/10 text-white focus:border-primary/50 transition-colors text-sm">
+                                <option value="">Select a subject</option>
+                                <option>Bug Bounty Collaboration</option>
+                                <option>Speaking Opportunity</option>
+                                <option>Security Consultation</option>
+                                <option>Just Saying Hi</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400 mb-2">Message</label>
+                            <textarea rows="5" name="message" required class="w-full px-4 py-3 rounded-xl bg-dark border border-white/10 text-white placeholder-gray-600 focus:border-primary/50 transition-colors resize-none text-sm" placeholder="Your message..."></textarea>
+                        </div>
+                        <button type="submit" id="submitBtn" class="w-full py-3.5 rounded-xl bg-primary text-dark font-bold hover:bg-primary/90 transition-all duration-200 flex items-center justify-center gap-2 text-sm">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                            <span id="btnText">Send Message</span>
+                        </button>
+                        <div id="formStatus" class="hidden text-center text-sm"></div>
+                    </form>
+
+                    <div class="mt-8 pt-6 border-t border-white/10">
+                        <div class="flex flex-wrap justify-center gap-5">
+                            <a href="https://twitter.com/0xmaruf" target="_blank" class="flex items-center gap-2 text-sm text-gray-400 hover:text-primary transition-colors duration-200">
+                                <i data-lucide="twitter" class="w-4 h-4"></i>
+                                Twitter
+                            </a>
+                            <a href="https://github.com/0xmaruf" target="_blank" class="flex items-center gap-2 text-sm text-gray-400 hover:text-primary transition-colors duration-200">
+                                <i data-lucide="github" class="w-4 h-4"></i>
+                                GitHub
+                            </a>
+                            <a href="https://linkedin.com/in/0xmaruf" target="_blank" class="flex items-center gap-2 text-sm text-gray-400 hover:text-primary transition-colors duration-200">
+                                <i data-lucide="linkedin" class="w-4 h-4"></i>
+                                LinkedIn
+                            </a>
+                            <a href="https://hackerone.com/0xmaruf" target="_blank" class="flex items-center gap-2 text-sm text-gray-400 hover:text-primary transition-colors duration-200">
+                                <i data-lucide="shield" class="w-4 h-4"></i>
+                                HackerOne
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 border-t border-white/5">
+        <div class="section-container">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-primary"></i>
+                    <span class="font-mono font-bold text-lg">0xmaruf</span>
+                </div>
+
+                <div class="flex items-center gap-4 text-xs text-gray-600">
+                    <span>Md Maruf Hosan</span>
+                    <span class="hidden md:inline">·</span>
+                    <span>All rights reserved</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <a href="https://twitter.com/0xmaruf" target="_blank" class="w-9 h-9 rounded-full glass flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary/30 transition-all duration-200">
+                        <i data-lucide="twitter" class="w-4 h-4"></i>
+                    </a>
+                    <a href="https://github.com/0xmaruf" target="_blank" class="w-9 h-9 rounded-full glass flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary/30 transition-all duration-200">
+                        <i data-lucide="github" class="w-4 h-4"></i>
+                    </a>
+                    <a href="https://hackerone.com/0xmaruf" target="_blank" class="w-9 h-9 rounded-full glass flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary/30 transition-all duration-200">
+                        <i data-lucide="shield" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons immediately
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+        }
+
+        // Navbar scroll effect - throttled
+        let ticking = false;
+        const nav = document.querySelector('nav');
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    if (window.pageYOffset > 50) {
+                        nav?.classList.add('shadow-lg', 'shadow-primary/5');
+                    } else {
+                        nav?.classList.remove('shadow-lg', 'shadow-primary/5');
+                    }
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }, { passive: true });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Fast Intersection Observer for fade-in
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.05, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Contact form handling
+        const contactForm = document.getElementById('contactForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const formStatus = document.getElementById('formStatus');
+
+        if (contactForm) {
+            contactForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                // Disable button
+                submitBtn.disabled = true;
+                btnText.textContent = 'Sending...';
+
+                const formData = new FormData(contactForm);
+
+                try {
+                    const response = await fetch(contactForm.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        btnText.textContent = 'Sent!';
+                        formStatus.textContent = '✓ Message sent successfully! I\'ll get back to you soon.';
+                        formStatus.className = 'text-center text-sm text-primary mt-3';
+                        contactForm.reset();
+
+                        setTimeout(() => {
+                            btnText.textContent = 'Send Message';
+                            submitBtn.disabled = false;
+                            formStatus.className = 'hidden';
+                        }, 5000);
+                    } else {
+                        throw new Error('Form submission failed');
+                    }
+                } catch (error) {
+                    btnText.textContent = 'Send Message';
+                    formStatus.textContent = '✗ Oops! Something went wrong. Please try again or contact me via social media.';
+                    formStatus.className = 'text-center text-sm text-red-400 mt-3';
+                    submitBtn.disabled = false;
+                }
+            });
+        }
+
+        // 3D Tilt Effect for Profile Image (Mouse & Touch)
+        const profileContainer = document.getElementById('profileContainer');
+        const profileImage = document.getElementById('profileImage');
+        const profileGlow = document.getElementById('profileGlow');
+        const profileBadge = document.getElementById('profileBadge');
+
+        if (profileContainer && profileImage) {
+            // Function to handle tilt effect
+            function applyTiltEffect(x, y, rect) {
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+
+                const rotateX = (y - centerY) / 10;
+                const rotateY = (centerX - x) / 10;
+
+                profileImage.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+                profileGlow.style.transform = `scale(1.2)`;
+                profileGlow.style.opacity = '0.3';
+                profileBadge.style.transform = `translateY(-5px) scale(1.05)`;
+            }
+
+            // Mouse support
+            profileContainer.addEventListener('mousemove', (e) => {
+                const rect = profileContainer.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                applyTiltEffect(x, y, rect);
+            });
+
+            // Touch support for mobile
+            profileContainer.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = profileContainer.getBoundingClientRect();
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                applyTiltEffect(x, y, rect);
+            }, { passive: false });
+
+            // Reset on mouse leave
+            profileContainer.addEventListener('mouseleave', () => {
+                profileImage.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)';
+                profileGlow.style.transform = 'scale(1.1)';
+                profileGlow.style.opacity = '1';
+                profileBadge.style.transform = 'translateY(0) scale(1)';
+            });
+
+            // Reset on touch end
+            profileContainer.addEventListener('touchend', () => {
+                profileImage.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)';
+                profileGlow.style.transform = 'scale(1.1)';
+                profileGlow.style.opacity = '1';
+                profileBadge.style.transform = 'translateY(0) scale(1)';
+            });
+
+            // Add floating animation on hover/touch
+            profileContainer.addEventListener('mouseenter', () => {
+                profileImage.style.transition = 'transform 0.1s ease-out';
+            });
+
+            profileContainer.addEventListener('touchstart', () => {
+                profileImage.style.transition = 'transform 0.1s ease-out';
+            }, { passive: true });
+
+            profileContainer.addEventListener('mouseleave', () => {
+                profileImage.style.transition = 'transform 0.5s ease-out';
+            });
+
+            profileContainer.addEventListener('touchend', () => {
+                profileImage.style.transition = 'transform 0.5s ease-out';
+            }, { passive: true });
+        }
+
+        // Lightbox Gallery for Swag Images
+        const swagImages = [
+            { src: 'https://raw.githubusercontent.com/0xmaruf/netlify/refs/heads/main/bughunt/photo_2024-11-21_12-57-59.jpg', caption: 'HackerOne T-Shirt' },
+            { src: 'https://raw.githubusercontent.com/0xmaruf/netlify/refs/heads/main/bughunt/photo_2024-11-20_02-43-37.jpg', caption: 'Sticker Collection' },
+            { src: 'https://raw.githubusercontent.com/0xmaruf/netlify/refs/heads/main/bughunt/photo_2024-11-20_02-43-19.jpg', caption: '' },
+            { src: 'https://raw.githubusercontent.com/0xmaruf/netlify/refs/heads/main/swags/-bvas0e.jpg', caption: '' },
+            { src: 'https://bughunt.info/wp-content/uploads/2025/05/DSC01226-scaled.jpg', caption: '' },
+            { src: 'https://bughunt.info/wp-content/uploads/2025/05/DSC01147-2048x1365.jpg', caption: '' },
+            { src: 'https://bughunt.info/wp-content/uploads/2025/05/DSC01084-scaled.jpg', caption: '' },
+            { src: 'https://bughunt.info/wp-content/uploads/2025/06/DSC00639-scaled.jpg', caption: '' }
+        ];
+
+        let currentImageIndex = 0;
+
+        function openLightbox(index) {
+            currentImageIndex = index;
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImage = document.getElementById('lightboxImage');
+            const lightboxCaption = document.getElementById('lightboxCaption');
+
+            lightboxImage.src = swagImages[index].src;
+            lightboxCaption.textContent = swagImages[index].caption;
+            lightbox.classList.remove('hidden');
+            lightbox.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+
+            // Re-initialize Lucide icons for the lightbox
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.add('hidden');
+            lightbox.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % swagImages.length;
+            const lightboxImage = document.getElementById('lightboxImage');
+            const lightboxCaption = document.getElementById('lightboxCaption');
+            lightboxImage.src = swagImages[currentImageIndex].src;
+            lightboxCaption.textContent = swagImages[currentImageIndex].caption;
+        }
+
+        function previousImage() {
+            currentImageIndex = (currentImageIndex - 1 + swagImages.length) % swagImages.length;
+            const lightboxImage = document.getElementById('lightboxImage');
+            const lightboxCaption = document.getElementById('lightboxCaption');
+            lightboxImage.src = swagImages[currentImageIndex].src;
+            lightboxCaption.textContent = swagImages[currentImageIndex].caption;
+        }
+
+        // Keyboard navigation for lightbox
+        document.addEventListener('keydown', function(e) {
+            const lightbox = document.getElementById('lightbox');
+            if (!lightbox.classList.contains('hidden')) {
+                if (e.key === 'Escape') closeLightbox();
+                if (e.key === 'ArrowRight') nextImage();
+                if (e.key === 'ArrowLeft') previousImage();
+            }
+        });
+    </script>
+</body>
+</html>
