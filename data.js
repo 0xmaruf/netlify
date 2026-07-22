@@ -1,5 +1,5 @@
 window.currentUser = {
     username: "alice",
-    email: "[email protected]",
+    email: "victim@yahoo.com",
     csrf: "csrf-secret-123"
 };
