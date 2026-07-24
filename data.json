@@ -1,0 +1,7 @@
+{
+    "id": 1050595049,
+    "username": "alice",
+    "email": "alice@victim.com",
+    "csrf_token": "csrf-secret-123",
+    "is_admin": true
+}
