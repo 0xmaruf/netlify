@@ -1,7 +1,16 @@
-{
+[
+  {
     "id": 1050595049,
-    "username": "alice",
-    "email": "alice@victim.com",
-    "csrf_token": "csrf-secret-123",
-    "is_admin": true
-}
+    "name": "Test account for 0xmaruf+new1@wearehackerone.com",
+    "created_at": "2026-01-15T16:37:33.000+04:00",
+    "updated_at": "2026-01-15T16:37:33.000+04:00",
+    "registration_types_selection": false,
+    "users_count": 15,
+    "vaults_count": 1,
+    "licenses": 5000,
+    "maximum_processors": 3,
+    "single_sign_on": false,
+    "linking_across_vaults": false,
+    "labguru_integration": false
+  }
+]
